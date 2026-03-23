@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Blog Fintech</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI';
+    background: #0f172a;
+    color: white;
+}
+
+/* NAVBAR */
+nav {
+    background: #020617;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav h2 {
+    color: #38bdf8;
+}
+
+nav input {
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+/* HERO */
+.hero {
+    padding: 30px;
+    text-align: center;
+}
+
+.hero h1 {
+    color: #38bdf8;
+}
+
+/* LAYOUT */
+.container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* ARTICLES */
+#articles {
+    flex: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.title {
+    font-size: 18px;
+    color: #38bdf8;
+}
+
+.category {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.author {
+    font-size: 14px;
+}
+
+/* FORM */
+.form {
+    flex: 1;
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    height: fit-content;
+}
+
+.form h3 {
+    margin-top: 0;
+}
+
+.form input, .form textarea {
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+.form button {
+    width: 100%;
+    padding: 10px;
+    background: #38bdf8;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<nav>
+    <h2>💎 Fintech Blog</h2>
+    <input type="text" placeholder="Rechercher..." onkeyup="searchArticles(this.value)">
+</nav>
+
+<div class="hero">
+    <h1>Gestion intelligente des articles</h1>
+    <p>Créer, explorer et analyser du contenu</p>
+</div>
+
+<div class="container">
+
+    <!-- ARTICLES -->
+    <div id="articles"></div>
+
+    <!-- FORM -->
+    <div class="form">
+        <h3>Créer un article</h3>
+
+        <input id="titre" placeholder="Titre">
+        <input id="auteur" placeholder="Auteur">
+        <input id="categorie" placeholder="Catégorie">
+        <input id="date" type="date">
+        <input id="tags" placeholder="Tags (ex: java,spring)">
+        <textarea id="contenu" placeholder="Contenu"></textarea>
+
+        <button onclick="addArticle()">Publier</button>
+    </div>
+
+</div>
+
+<script>
+const API = "http://localhost:8080/api/articles";
+
+function loadArticles() {
+    fetch(API)
+    .then(res => res.json())
+    .then(data => displayArticles(data));
+}
+
+function displayArticles(data) {
+    const container = document.getElementById("articles");
+    container.innerHTML = "";
+
+    data.forEach(a => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <div class="title">${a.titre}</div>
+            <div class="category">📂 ${a.categorie}</div>
+            <div class="author">✍️ ${a.auteur}</div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function addArticle() {
+    const article = {
+        titre: document.getElementById("titre").value,
+        auteur: document.getElementById("auteur").value,
+        contenu: document.getElementById("contenu").value,
+        categorie: document.getElementById("categorie").value,
+        date: document.getElementById("date").value,
+        tags: document.getElementById("tags").value
+    };
+
+    fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(article)
+    })
+    .then(() => {
+        alert("✅ Article publié !");
+        loadArticles();
+    });
+}
+
+function searchArticles(query) {
+    fetch(API + "/search?query=" + query)
+    .then(res => res.json())
+    .then(data => displayArticles(data));
+}
+
+window.onload = loadArticles;
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
